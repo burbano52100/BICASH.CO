@@ -2,14 +2,14 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  full_name TEXT NOT NULL,
-  username TEXT NOT NULL UNIQUE,
-  email TEXT NOT NULL UNIQUE,
-  role TEXT NOT NULL CHECK (role IN ('Administrador', 'Analista', 'Desarrollador', 'Operador', 'Invitado')),
-  password_hash TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  nombre_completo TEXT NOT NULL,
+  usuario TEXT NOT NULL UNIQUE,
+  correo TEXT NOT NULL UNIQUE,
+  rol TEXT NOT NULL CHECK (rol IN ('Administrador', 'Analista', 'Desarrollador', 'Operador', 'Invitado')),
+  hash_contrasena TEXT NOT NULL,
+  creado_en TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+CREATE INDEX IF NOT EXISTS idx_usuarios_correo ON usuarios (correo);

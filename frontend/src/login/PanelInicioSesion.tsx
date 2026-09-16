@@ -1,40 +1,40 @@
 import { useState } from "react";
-import { InputField, ErrorBox, Spinner } from "./FormFields";
-import { login, type AuthUser } from "./api";
+import { CampoTexto, CajaError, IndicadorCarga } from "./CamposFormulario";
+import { iniciarSesion, type UsuarioAutenticado } from "./api";
 
-export function LoginPanel({ onSwitch }: { onSwitch: () => void }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
-  const [loading, setLoading] = useState(false);
+export function PanelInicioSesion({ alCambiarVista }: { alCambiarVista: () => void }) {
+  const [usuario, setUsuario] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [recordar, setRecordar] = useState(false);
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [usuarioAutenticado, setUsuarioAutenticado] = useState<UsuarioAutenticado | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function manejarEnvio(e: React.FormEvent) {
     e.preventDefault();
-    if (!username || !password) { setError("Todos los campos son obligatorios."); return; }
+    if (!usuario || !contrasena) { setError("Todos los campos son obligatorios."); return; }
     setError("");
-    setLoading(true);
+    setCargando(true);
     try {
-      const { token, user: loggedInUser } = await login(username, password);
-      (remember ? localStorage : sessionStorage).setItem("bicash_token", token);
-      setUser(loggedInUser);
+      const { token, usuario: datosUsuario } = await iniciarSesion(usuario, contrasena);
+      (recordar ? localStorage : sessionStorage).setItem("token_bicash", token);
+      setUsuarioAutenticado(datosUsuario);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo iniciar sesión.");
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   }
 
-  function handleLogout() {
-    localStorage.removeItem("bicash_token");
-    sessionStorage.removeItem("bicash_token");
-    setUser(null);
-    setUsername("");
-    setPassword("");
+  function manejarCierreSesion() {
+    localStorage.removeItem("token_bicash");
+    sessionStorage.removeItem("token_bicash");
+    setUsuarioAutenticado(null);
+    setUsuario("");
+    setContrasena("");
   }
 
-  if (user) {
+  if (usuarioAutenticado) {
     return (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "16px 0", textAlign: "center" }}>
         <div style={{
@@ -51,10 +51,10 @@ export function LoginPanel({ onSwitch }: { onSwitch: () => void }) {
             SESIÓN INICIADA
           </div>
           <p style={{ fontFamily: "Exo 2, sans-serif", fontSize: "0.875rem", color: "#3a5070", margin: "4px 0 0" }}>
-            Bienvenido, {user.fullName} ({user.role}).
+            Bienvenido, {usuarioAutenticado.nombreCompleto} ({usuarioAutenticado.rol}).
           </p>
         </div>
-        <button onClick={handleLogout} className="btn-primary"
+        <button onClick={manejarCierreSesion} className="btn-primary"
           style={{ padding: "10px 32px", borderRadius: 8, fontSize: "0.85rem" }}>
           CERRAR SESIÓN
         </button>
@@ -63,23 +63,23 @@ export function LoginPanel({ onSwitch }: { onSwitch: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <InputField label="Usuario" value={username} onChange={setUsername} placeholder="usuario@gmail.com" mono />
-      <InputField label="Contraseña" type="password" value={password} onChange={setPassword} placeholder="••••••••••••" />
+    <form onSubmit={manejarEnvio} style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <CampoTexto etiqueta="Usuario" valor={usuario} alCambiar={setUsuario} marcadorPosicion="usuario@gmail.com" mono />
+      <CampoTexto etiqueta="Contraseña" tipo="password" valor={contrasena} alCambiar={setContrasena} marcadorPosicion="••••••••••••" />
 
-      {error && <ErrorBox msg={error} />}
+      {error && <CajaError mensaje={error} />}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
-          onClick={() => setRemember(!remember)}>
+          onClick={() => setRecordar(!recordar)}>
           <div style={{
             width: 16, height: 16, borderRadius: 4,
-            border: `1.5px solid ${remember ? "#00d4ff" : "rgba(0,212,255,0.25)"}`,
-            background: remember ? "#00d4ff" : "transparent",
+            border: `1.5px solid ${recordar ? "#00d4ff" : "rgba(0,212,255,0.25)"}`,
+            background: recordar ? "#00d4ff" : "transparent",
             display: "flex", alignItems: "center", justifyContent: "center",
             transition: "all 0.2s",
           }}>
-            {remember && (
+            {recordar && (
               <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
                 <path d="M1 3.5l2.5 2.5L8 1" stroke="#050810" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -95,16 +95,16 @@ export function LoginPanel({ onSwitch }: { onSwitch: () => void }) {
         </button>
       </div>
 
-      <button type="submit" disabled={loading} className="btn-primary"
+      <button type="submit" disabled={cargando} className="btn-primary"
         style={{ width: "100%", padding: "15px", borderRadius: 8, fontSize: "1.05rem" }}>
-        {loading
-          ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><Spinner /> AUTENTICANDO...</span>
+        {cargando
+          ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><IndicadorCarga /> AUTENTICANDO...</span>
           : "INICIAR SESIÓN"}
       </button>
 
       <p style={{ textAlign: "center", margin: 0, fontFamily: "Exo 2, sans-serif", fontSize: "1rem", color: "#3a5070" }}>
         ¿No tienes cuenta?{" "}
-        <button type="button" onClick={onSwitch} style={{
+        <button type="button" onClick={alCambiarVista} style={{
           background: "none", border: "none", cursor: "pointer",
           color: "#00d4ff", fontFamily: "Rajdhani, sans-serif",
           fontWeight: 700, fontSize: "1rem", letterSpacing: "0.08em",

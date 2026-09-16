@@ -1,76 +1,76 @@
 # bicash-co
 
-Monorepo (pnpm workspaces) with three layers: `frontend/` (React + Vite + Tailwind CSS, running inside Figma Make), `backend/` (Node.js + Express API), and `database/` (PostgreSQL schema). The login/registration feature spans all three: UI in `frontend/src/login/`, endpoints in `backend/src/routes/auth.ts`, and the `users` table in `database/schema.sql`.
+Monorepo (workspaces de pnpm) con tres capas: `frontend/` (React + Vite + Tailwind CSS, ejecutándose dentro de Figma Make), `backend/` (API en Node.js + Express) y `database/` (esquema de PostgreSQL). La funcionalidad de login/registro abarca las tres capas: la interfaz en `frontend/src/login/`, los endpoints en `backend/src/routes/autenticacion.ts`, y la tabla `usuarios` en `database/schema.sql`.
 
-## Development Server
+## Servidor de desarrollo
 
-A Vite development server is **already running** on `$PORT` (default 8443) for the **frontend only**. You don't need to start it manually.
+Ya hay un servidor de desarrollo de Vite **corriendo** en `$PORT` (por defecto 8443), solo para el **frontend**. No es necesario iniciarlo manualmente.
 
-- Preview URL: The user can access the running app through the preview panel
-- Hot reload: Changes to source files are reflected immediately
-- The **backend** is not managed by Figma Make. Run it yourself with `pnpm dev:backend` (see `backend/` below); the frontend dev server proxies `/api/*` requests to it.
+- URL de vista previa: el usuario puede acceder a la app corriendo a través del panel de vista previa
+- Recarga en caliente: los cambios en los archivos fuente se reflejan de inmediato
+- El **backend** no es gestionado por Figma Make. Se ejecuta aparte con `pnpm dev:backend` (ver `backend/` más abajo); el servidor de desarrollo del frontend redirige (proxy) las peticiones a `/api/*` hacia él.
 
-## Project Structure
+## Estructura del proyecto
 
-This is the canonical project structure. Start with task-relevant files below. Only follow imports or inspect other files when required, when a documented path is missing, or when the repository contradicts this guide.
+Esta es la estructura canónica del proyecto. Empieza por los archivos relevantes a la tarea listados abajo. Solo sigue imports o revisa otros archivos cuando sea necesario, cuando falte una ruta documentada, o cuando el repositorio contradiga esta guía.
 
-### Root
+### Raíz
 
-- `package.json` - Workspace root; `dev`/`build`/`preview` delegate to `frontend`, `dev:backend`/`build:backend`/`start:backend` delegate to `backend`, `db:migrate` applies `database/schema.sql`
-- `pnpm-workspace.yaml` - Declares the `frontend` and `backend` workspace packages
-- `.mise.toml` - Toolchain versions for Node.js and pnpm
+- `package.json` - Raíz del workspace; `dev`/`build`/`preview` delegan a `frontend`, `dev:backend`/`build:backend`/`start:backend` delegan a `backend`, `db:migrate` aplica `database/schema.sql`
+- `pnpm-workspace.yaml` - Declara los paquetes del workspace `frontend` y `backend`
+- `.mise.toml` - Versiones del toolchain para Node.js y pnpm
 
-### `frontend/` - React + Vite + Tailwind CSS UI
+### `frontend/` - Interfaz en React + Vite + Tailwind CSS
 
-- `src/main.tsx` - React entrypoint; imports `src/index.css` and mounts `src/App.tsx` into the `#root` element
-- `src/App.tsx` - Renders `AuthPage` from `src/login/`
-- `src/login/` - All login/registration UI and client logic:
-  - `AuthPage.tsx` - The auth card shell (chrome bar, logo, footer) that switches between login and register views
-  - `LoginPanel.tsx` - Login form; calls the backend via `api.ts` and shows an authenticated/logout state on success
-  - `RegisterPanel.tsx` - Registration form; calls the backend via `api.ts` and shows a success state
-  - `api.ts` - `fetch` wrappers for `POST /api/auth/login` and `POST /api/auth/register`
-  - `FormFields.tsx` - Shared field primitives (`Label`, `InputField`, `SelectField`, `ErrorBox`, `Spinner`, `PasswordStrength`)
-  - `Logo.tsx`, `useFullscreen.ts`, `types.ts` - Supporting UI/logic
-  - `index.ts` - Barrel export
-- `src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
-- `index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
-- `package.json` - Frontend dependencies and Vite dev/build/preview scripts
-- `vite.config.ts` - Vite configuration with React, Tailwind CSS v4, Figma Make plugins, the `@` alias for `src`, a build `outDir` pointed at the repo-root `dist/` (so `.figma/make/deploy` keeps working), and a `/api` dev-server proxy to the backend
+- `src/main.tsx` - Punto de entrada de React; importa `src/index.css` y monta `src/App.tsx` en el elemento `#root`
+- `src/App.tsx` - Renderiza `PaginaAutenticacion` desde `src/login/`
+- `src/login/` - Toda la interfaz y lógica de cliente de login/registro:
+  - `PaginaAutenticacion.tsx` - La tarjeta contenedora (barra superior, logo, pie de página) que alterna entre las vistas de inicio de sesión y registro
+  - `PanelInicioSesion.tsx` - Formulario de inicio de sesión; llama al backend mediante `api.ts` y muestra un estado autenticado/cierre de sesión al tener éxito
+  - `PanelRegistro.tsx` - Formulario de registro; llama al backend mediante `api.ts` y muestra un estado de éxito
+  - `api.ts` - Envoltorios de `fetch` para `POST /api/autenticacion/iniciar-sesion` y `POST /api/autenticacion/registro`
+  - `CamposFormulario.tsx` - Componentes de campo compartidos (`Etiqueta`, `CampoTexto`, `CampoSelector`, `CajaError`, `IndicadorCarga`, `FortalezaContrasena`)
+  - `Logo.tsx`, `usePantallaCompleta.ts`, `types.ts` - Lógica e interfaz de soporte
+  - `index.ts` - Exportación centralizada (barrel)
+- `src/index.css` - Punto de entrada de CSS global e import de Tailwind CSS v4
+- `index.html` - Plantilla HTML de Vite que contiene el elemento `#root` y carga `src/main.tsx`
+- `package.json` - Dependencias del frontend y scripts de Vite (dev/build/preview)
+- `vite.config.ts` - Configuración de Vite con React, Tailwind CSS v4, plugins de Figma Make, el alias `@` para `src`, un `outDir` de build apuntando al `dist/` de la raíz del repo (para que `.figma/make/deploy` siga funcionando), y un proxy `/api` del servidor de desarrollo hacia el backend
 
-### `backend/` - Node.js + Express API
+### `backend/` - API en Node.js + Express
 
-- `src/index.ts` - Express app bootstrap (CORS, JSON body parsing, `/api/health`, mounts `routes/auth.ts`, error handler)
-- `src/routes/auth.ts` - `POST /api/auth/register` and `POST /api/auth/login`; hashes passwords with bcrypt and issues a JWT on login
-- `src/db.ts` - `pg` connection pool built from `DATABASE_URL`
-- `src/middleware/errorHandler.ts` - Catch-all Express error handler
-- `scripts/migrate.ts` - Applies `database/schema.sql` to `DATABASE_URL`
-- `.env.example` - Copy to `.env` and fill in `DATABASE_URL`, `JWT_SECRET`, `PORT`, `CORS_ORIGIN`
-- `package.json` - Backend dependencies and `dev`/`build`/`start`/`db:migrate` scripts (`tsx` for dev, `tsc` for build)
+- `src/index.ts` - Arranque de la app Express (CORS, parseo de JSON, `/api/salud`, monta `routes/autenticacion.ts`, manejador de errores)
+- `src/routes/autenticacion.ts` - `POST /api/autenticacion/registro` y `POST /api/autenticacion/iniciar-sesion`; aplica hash a las contraseñas con bcrypt y emite un JWT al iniciar sesión
+- `src/baseDatos.ts` - Pool de conexiones `pg` construido a partir de `DATABASE_URL`
+- `src/middleware/manejadorErrores.ts` - Manejador de errores de Express genérico
+- `scripts/migrate.ts` - Aplica `database/schema.sql` contra `DATABASE_URL`
+- `.env.example` - Cópialo a `.env` y completa `DATABASE_URL`, `JWT_SECRET`, `PORT`, `CORS_ORIGIN`
+- `package.json` - Dependencias del backend y scripts `dev`/`build`/`start`/`db:migrate` (`tsx` para desarrollo, `tsc` para build)
 
-### `database/` - PostgreSQL schema
+### `database/` - Esquema de PostgreSQL
 
-- `schema.sql` - `users` table (full name, username, email, role, bcrypt password hash) plus indexes
-- `README.md` - Local setup instructions and column reference
+- `schema.sql` - Tabla `usuarios` (nombre completo, usuario, correo, rol, hash de contraseña con bcrypt) más índices
+- `README.md` - Instrucciones de configuración local y referencia de columnas
 
-## Dependencies
+## Dependencias
 
-- Frontend runtime: React 19 and React DOM 19
-- Frontend styling: Tailwind CSS v4 with the `@tailwindcss/vite` plugin
-- Frontend build tooling: Vite 8, TypeScript 5.7, and `@vitejs/plugin-react`
-- Backend runtime: Express, `pg`, `bcryptjs`, `jsonwebtoken`, `dotenv`, `cors`
-- Backend build tooling: TypeScript 5.7, `tsx`
-- Database: PostgreSQL (via `pg`)
-- Formatting: oxfmt (run from the repo root: `pnpm format`)
+- Runtime del frontend: React 19 y React DOM 19
+- Estilos del frontend: Tailwind CSS v4 con el plugin `@tailwindcss/vite`
+- Herramientas de build del frontend: Vite 8, TypeScript 5.7, y `@vitejs/plugin-react`
+- Runtime del backend: Express, `pg`, `bcryptjs`, `jsonwebtoken`, `dotenv`, `cors`
+- Herramientas de build del backend: TypeScript 5.7, `tsx`
+- Base de datos: PostgreSQL (vía `pg`)
+- Formateo: oxfmt (ejecutar desde la raíz del repo: `pnpm format`)
 
-## Styling
+## Estilos
 
-This project uses **Tailwind CSS v4** through the `@tailwindcss/vite` plugin configured in `frontend/vite.config.ts`. `frontend/src/index.css` imports Tailwind with `@import 'tailwindcss';`. Use Tailwind utility classes directly in JSX and put global CSS or Tailwind v4 theme customization in `frontend/src/index.css`. This scaffold does not need a Tailwind config file or PostCSS config.
+Este proyecto usa **Tailwind CSS v4** a través del plugin `@tailwindcss/vite` configurado en `frontend/vite.config.ts`. `frontend/src/index.css` importa Tailwind con `@import 'tailwindcss';`. Usa clases utilitarias de Tailwind directamente en el JSX y coloca el CSS global o la personalización del tema de Tailwind v4 en `frontend/src/index.css`. Este scaffold no necesita un archivo de configuración de Tailwind ni de PostCSS.
 
-`frontend/src/main.tsx` imports `frontend/src/index.css`, so global font wiring belongs in `frontend/src/index.css`. Keep CSS `@import` statements first, then add any `@font-face` rules and font-family defaults there.
+`frontend/src/main.tsx` importa `frontend/src/index.css`, así que la configuración global de fuentes va en `frontend/src/index.css`. Mantén los `@import` de CSS primero, y luego agrega cualquier regla `@font-face` y los valores por defecto de `font-family` ahí.
 
-## Code quality
+## Calidad de código
 
-- Use double quotes for strings containing apostrophes (`"We're here to help"`), or escape them in single-quoted strings. An unescaped apostrophe in a single-quoted string breaks the build.
-- Ensure JSX tags are closed and braces are balanced.
-- Export frontend components as named exports from `src/login/*` and as the default export from `src/App.tsx`.
-- Never commit `backend/.env` or real credentials; only `.env.example` is tracked.
+- Usa comillas dobles para cadenas con apóstrofes (`"We're here to help"`), o escápalas dentro de comillas simples. Un apóstrofe sin escapar dentro de una cadena con comillas simples rompe el build.
+- Asegúrate de que las etiquetas JSX estén cerradas y las llaves balanceadas.
+- Exporta los componentes del frontend como exportaciones nombradas desde `src/login/*` y como exportación por defecto desde `src/App.tsx`.
+- Nunca subas `backend/.env` ni credenciales reales; solo `.env.example` está versionado.

@@ -16,14 +16,14 @@ PostgreSQL. El esquema vive en `schema.sql`.
 
 ## Tablas
 
-### `users`
+### `usuarios`
 
-| Columna         | Tipo          | Notas                                                                 |
-|-----------------|---------------|------------------------------------------------------------------------|
-| `id`            | `uuid`        | Clave primaria, generada con `gen_random_uuid()`.                     |
-| `full_name`     | `text`        | Nombre completo.                                                       |
-| `username`      | `text`        | Único.                                                                  |
-| `email`         | `text`        | Único.                                                                  |
-| `role`          | `text`        | Uno de: Administrador, Analista, Desarrollador, Operador, Invitado.    |
-| `password_hash` | `text`        | Hash bcrypt de la contraseña (nunca se guarda en texto plano).        |
-| `created_at`    | `timestamptz` | Fecha de creación.                                                     |
+| Columna           | Tipo          | Notas                                                                 |
+|--------------------|---------------|------------------------------------------------------------------------|
+| `id`                | `uuid`        | Clave primaria, generada con `gen_random_uuid()`.                     |
+| `nombre_completo`   | `text`        | Nombre completo.                                                       |
+| `usuario`           | `text`        | Nombre de usuario, único.                                              |
+| `correo`            | `text`        | Correo electrónico, único.                                             |
+| `rol`               | `text`        | Uno de: Administrador, Analista, Desarrollador, Operador, Invitado.    |
+| `hash_contrasena`   | `text`        | Hash bcrypt de la contraseña (nunca se guarda en texto plano).        |
+| `creado_en`         | `timestamptz` | Fecha de creación.                                                     |

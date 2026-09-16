@@ -1,12 +1,12 @@
-export type View = "login" | "register";
+export type Vista = "inicio" | "registro";
 
-export interface RegisterForm {
-  fullName: string;
-  username: string;
-  email: string;
-  role: string;
-  password: string;
-  confirmPassword: string;
+export interface FormularioRegistro {
+  nombreCompleto: string;
+  usuario: string;
+  correo: string;
+  rol: string;
+  contrasena: string;
+  confirmarContrasena: string;
 }
 
 export const ROLES = ["Administrador", "Analista", "Desarrollador", "Operador", "Invitado"];

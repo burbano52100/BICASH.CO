@@ -1,5 +1,7 @@
 {
-  "description": "This web application offers a secure login system for users to access their accounts and includes a user creation feature, designed with a modern dark color palette.",
+  "title": "BICASH.CO — Acceso seguro",
+  "description": "Esta aplicación web ofrece un sistema de inicio de sesión seguro para que los usuarios accedan a sus cuentas e incluye una función de creación de usuarios, diseñada con una paleta oscura moderna.",
+  "language": "es",
   "robots": {
     "index": false
   },

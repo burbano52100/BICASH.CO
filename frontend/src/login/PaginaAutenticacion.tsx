@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Logo } from "./Logo";
-import { LoginPanel } from "./LoginPanel";
-import { RegisterPanel } from "./RegisterPanel";
-import { useFullscreen } from "./useFullscreen";
-import type { View } from "./types";
+import { PanelInicioSesion } from "./PanelInicioSesion";
+import { PanelRegistro } from "./PanelRegistro";
+import { usePantallaCompleta } from "./usePantallaCompleta";
+import type { Vista } from "./types";
 
-export function AuthPage() {
-  const [view, setView] = useState<View>("login");
-  const { isFullscreen, toggle } = useFullscreen();
+export function PaginaAutenticacion() {
+  const [vista, setVista] = useState<Vista>("inicio");
+  const { esPantallaCompleta, alternar } = usePantallaCompleta();
 
   return (
     <div className="dot-grid" style={{
@@ -15,7 +15,7 @@ export function AuthPage() {
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: "24px 16px", position: "relative",
     }}>
-      {/* Ambient blobs */}
+      {/* Manchas ambientales */}
       <div style={{
         position: "fixed", top: "5%", left: "8%",
         width: 500, height: 500, borderRadius: "50%",
@@ -29,17 +29,17 @@ export function AuthPage() {
         filter: "blur(40px)", pointerEvents: "none",
       }} />
 
-      {/* Card */}
+      {/* Tarjeta */}
       <div className="auth-card corner-tl corner-br" style={{
         width: "100%",
-        maxWidth: view === "register" ? 680 : 540,
+        maxWidth: vista === "registro" ? 680 : 540,
         borderRadius: 14,
         overflow: "hidden",
         position: "relative",
         transition: "max-width 0.3s ease",
       }}>
 
-        {/* Chrome bar — green dot triggers fullscreen */}
+        {/* Barra superior — el punto verde activa pantalla completa */}
         <div style={{
           display: "flex", alignItems: "center", gap: 7,
           padding: "11px 18px",
@@ -49,13 +49,13 @@ export function AuthPage() {
           <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#ff5f57" }} />
           <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#febc2e" }} />
           <button
-            onClick={toggle}
-            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+            onClick={alternar}
+            title={esPantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
             style={{
               width: 11, height: 11, borderRadius: "50%",
-              background: isFullscreen ? "#00ffcc" : "#28c840",
+              background: esPantallaCompleta ? "#00ffcc" : "#28c840",
               border: "none", cursor: "pointer", padding: 0,
-              boxShadow: isFullscreen ? "0 0 8px rgba(0,255,204,0.7)" : "none",
+              boxShadow: esPantallaCompleta ? "0 0 8px rgba(0,255,204,0.7)" : "none",
               transition: "all 0.2s",
             }}
           />
@@ -78,16 +78,16 @@ export function AuthPage() {
           </div>
         </div>
 
-        {/* Body */}
+        {/* Cuerpo */}
         <div style={{ padding: "44px 52px 38px" }}>
           <Logo />
 
-          {view === "login"
-            ? <LoginPanel onSwitch={() => setView("register")} />
-            : <RegisterPanel onSwitch={() => setView("login")} />}
+          {vista === "inicio"
+            ? <PanelInicioSesion alCambiarVista={() => setVista("registro")} />
+            : <PanelRegistro alCambiarVista={() => setVista("inicio")} />}
         </div>
 
-        {/* Footer */}
+        {/* Pie de página */}
         <div style={{
           borderTop: "1px solid rgba(0,212,255,0.08)",
           padding: "10px 36px",

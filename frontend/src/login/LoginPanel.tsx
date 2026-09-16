@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { InputField, ErrorBox, Spinner } from "./FormFields";
+import { login, type AuthUser } from "./api";
 
 export function LoginPanel({ onSwitch }: { onSwitch: () => void }) {
   const [username, setUsername] = useState("");
@@ -7,13 +8,58 @@ export function LoginPanel({ onSwitch }: { onSwitch: () => void }) {
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!username || !password) { setError("Todos los campos son obligatorios."); return; }
     setError("");
     setLoading(true);
-    setTimeout(() => setLoading(false), 1800);
+    try {
+      const { token, user: loggedInUser } = await login(username, password);
+      (remember ? localStorage : sessionStorage).setItem("bicash_token", token);
+      setUser(loggedInUser);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo iniciar sesión.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("bicash_token");
+    sessionStorage.removeItem("bicash_token");
+    setUser(null);
+    setUsername("");
+    setPassword("");
+  }
+
+  if (user) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "16px 0", textAlign: "center" }}>
+        <div style={{
+          width: 60, height: 60, borderRadius: "50%",
+          background: "rgba(0,255,204,0.08)", border: "2px solid rgba(0,255,204,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M4 13l6.5 6.5L22 6" stroke="#00ffcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <div>
+          <div style={{ fontFamily: "Rajdhani, sans-serif", fontWeight: 700, fontSize: "1.1rem", color: "#00ffcc", letterSpacing: "0.1em" }}>
+            SESIÓN INICIADA
+          </div>
+          <p style={{ fontFamily: "Exo 2, sans-serif", fontSize: "0.875rem", color: "#3a5070", margin: "4px 0 0" }}>
+            Bienvenido, {user.fullName} ({user.role}).
+          </p>
+        </div>
+        <button onClick={handleLogout} className="btn-primary"
+          style={{ padding: "10px 32px", borderRadius: 8, fontSize: "0.85rem" }}>
+          CERRAR SESIÓN
+        </button>
+      </div>
+    );
   }
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { InputField, SelectField, ErrorBox, Spinner, PasswordStrength } from "./FormFields";
 import { ROLES, type RegisterForm } from "./types";
+import { register } from "./api";
 
 export function RegisterPanel({ onSwitch }: { onSwitch: () => void }) {
   const [form, setForm] = useState<RegisterForm>({
@@ -14,7 +15,7 @@ export function RegisterPanel({ onSwitch }: { onSwitch: () => void }) {
     return (v: string) => setForm((f) => ({ ...f, [key]: v }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const { fullName, username, email, role, password, confirmPassword } = form;
     if (!fullName || !username || !email || !role || !password || !confirmPassword) {
@@ -23,7 +24,14 @@ export function RegisterPanel({ onSwitch }: { onSwitch: () => void }) {
     if (password !== confirmPassword) { setError("Las contraseñas no coinciden."); return; }
     if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
     setError(""); setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 2000);
+    try {
+      await register(form);
+      setSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo crear la cuenta.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (success) {

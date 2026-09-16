@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 
-import siteConfiguration from './.figma/make/site.json'
+import siteConfiguration from '../.figma/make/site.json'
 
 // Vite config — https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -13,6 +13,11 @@ export default defineConfig(({ mode }) => {
   return {
     base: process.env.FIGMA_PUBLIC_URL ? `${process.env.FIGMA_PUBLIC_URL}/` : '/',
     build: {
+      // Emit to the repo root's dist/ so `.figma/make/deploy` (which runs
+      // `--build-dir dist` from the repo root) keeps working unchanged even
+      // though this config now lives inside frontend/.
+      outDir: path.resolve(__dirname, '../dist'),
+      emptyOutDir: true,
       sourcemap: emitSourcemaps ? 'inline' : false,
       minify: !emitSourcemaps,
     },
@@ -37,6 +42,12 @@ export default defineConfig(({ mode }) => {
         ignored: [
           '**/.figma/**',
 ],
+      },
+      proxy: {
+        '/api': {
+          target: process.env.BACKEND_URL || 'http://localhost:4000',
+          changeOrigin: true,
+        },
       },
     },
     preview: {

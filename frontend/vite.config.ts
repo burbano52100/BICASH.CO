@@ -13,9 +13,9 @@ export default defineConfig(({ mode }) => {
   return {
     base: process.env.FIGMA_PUBLIC_URL ? `${process.env.FIGMA_PUBLIC_URL}/` : '/',
     build: {
-      // Genera en dist/ en la raíz del repo para que `.figma/make/deploy`
-      // (que ejecuta `--build-dir dist` desde la raíz) siga funcionando sin
-      // cambios aunque esta configuración ahora viva dentro de frontend/.
+      // Emit to dist/ at the repo root so `.figma/make/deploy` (which runs
+      // `--build-dir dist` from the root) keeps working unchanged even
+      // though this config now lives inside frontend/.
       outDir: path.resolve(__dirname, '../dist'),
       emptyOutDir: true,
       sourcemap: emitSourcemaps ? 'inline' : false,

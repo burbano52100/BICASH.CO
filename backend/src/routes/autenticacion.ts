@@ -3,78 +3,82 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../baseDatos";
 
-const enrutadorAutenticacion = Router();
+const authRouter = Router();
 
+/** Roles a user account may have. Mirrors the `role` CHECK constraint in database/schema.sql. */
 const ROLES = ["Administrador", "Analista", "Desarrollador", "Operador", "Invitado"];
 
-enrutadorAutenticacion.post("/registro", async (req, res, next) => {
+/** POST /api/auth/register — creates a new user account. */
+authRouter.post("/register", async (req, res, next) => {
   try {
-    const { nombreCompleto, usuario, correo, rol, contrasena, confirmarContrasena } = req.body ?? {};
+    const { fullName, username, email, role, password, confirmPassword } = req.body ?? {};
 
-    if (!nombreCompleto || !usuario || !correo || !rol || !contrasena || !confirmarContrasena) {
-      return res.status(400).json({ mensaje: "Todos los campos son obligatorios." });
+    if (!fullName || !username || !email || !role || !password || !confirmPassword) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios." });
     }
-    if (!ROLES.includes(rol)) {
-      return res.status(400).json({ mensaje: "Rol inválido." });
+    if (!ROLES.includes(role)) {
+      return res.status(400).json({ message: "Rol inválido." });
     }
-    if (contrasena !== confirmarContrasena) {
-      return res.status(400).json({ mensaje: "Las contraseñas no coinciden." });
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Las contraseñas no coinciden." });
     }
-    if (contrasena.length < 8) {
-      return res.status(400).json({ mensaje: "La contraseña debe tener al menos 8 caracteres." });
+    if (password.length < 8) {
+      return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres." });
     }
 
-    const hashContrasena = await bcrypt.hash(contrasena, 12);
+    const passwordHash = await bcrypt.hash(password, 12);
 
-    const resultado = await pool.query(
-      `INSERT INTO usuarios (nombre_completo, usuario, correo, rol, hash_contrasena)
+    const result = await pool.query(
+      `INSERT INTO users (full_name, username, email, role, password_hash)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, nombre_completo AS "nombreCompleto", usuario, correo, rol, creado_en AS "creadoEn"`,
-      [nombreCompleto, usuario, correo, rol, hashContrasena],
+       RETURNING id, full_name AS "fullName", username, email, role, created_at AS "createdAt"`,
+      [fullName, username, email, role, passwordHash],
     );
 
-    return res.status(201).json({ usuario: resultado.rows[0] });
+    return res.status(201).json({ user: result.rows[0] });
   } catch (err: any) {
+    // Postgres unique_violation: username or email already exists.
     if (err?.code === "23505") {
-      return res.status(409).json({ mensaje: "El usuario o correo ya está registrado." });
+      return res.status(409).json({ message: "El usuario o correo ya está registrado." });
     }
     next(err);
   }
 });
 
-enrutadorAutenticacion.post("/iniciar-sesion", async (req, res, next) => {
+/** POST /api/auth/login — verifies credentials and issues a JWT. */
+authRouter.post("/login", async (req, res, next) => {
   try {
-    const { usuario, contrasena } = req.body ?? {};
+    const { username, password } = req.body ?? {};
 
-    if (!usuario || !contrasena) {
-      return res.status(400).json({ mensaje: "Todos los campos son obligatorios." });
+    if (!username || !password) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios." });
     }
 
-    const resultado = await pool.query(
-      `SELECT id, nombre_completo, usuario, correo, rol, hash_contrasena
-       FROM usuarios WHERE usuario = $1 OR correo = $1`,
-      [usuario],
+    const result = await pool.query(
+      `SELECT id, full_name, username, email, role, password_hash
+       FROM users WHERE username = $1 OR email = $1`,
+      [username],
     );
-    const usuarioEncontrado = resultado.rows[0];
+    const foundUser = result.rows[0];
 
-    if (!usuarioEncontrado || !(await bcrypt.compare(contrasena, usuarioEncontrado.hash_contrasena))) {
-      return res.status(401).json({ mensaje: "Credenciales inválidas." });
+    if (!foundUser || !(await bcrypt.compare(password, foundUser.password_hash))) {
+      return res.status(401).json({ message: "Credenciales inválidas." });
     }
 
     const token = jwt.sign(
-      { sub: usuarioEncontrado.id, rol: usuarioEncontrado.rol },
+      { sub: foundUser.id, role: foundUser.role },
       process.env.JWT_SECRET || "dev-secret",
       { expiresIn: "8h" },
     );
 
     return res.json({
       token,
-      usuario: {
-        id: usuarioEncontrado.id,
-        nombreCompleto: usuarioEncontrado.nombre_completo,
-        usuario: usuarioEncontrado.usuario,
-        correo: usuarioEncontrado.correo,
-        rol: usuarioEncontrado.rol,
+      user: {
+        id: foundUser.id,
+        fullName: foundUser.full_name,
+        username: foundUser.username,
+        email: foundUser.email,
+        role: foundUser.role,
       },
     });
   } catch (err) {
@@ -82,4 +86,4 @@ enrutadorAutenticacion.post("/iniciar-sesion", async (req, res, next) => {
   }
 });
 
-export default enrutadorAutenticacion;
+export default authRouter;

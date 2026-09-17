@@ -1,18 +1,19 @@
 import { useState, useCallback, useEffect } from "react";
 
-export function usePantallaCompleta() {
-  const [esPantallaCompleta, setEsPantallaCompleta] = useState(false);
+/** Tracks and toggles browser fullscreen mode. */
+export function useFullscreen() {
+  const [isFullscreen, setIsFullscreen] = useState(false);
   useEffect(() => {
-    const manejador = () => setEsPantallaCompleta(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", manejador);
-    return () => document.removeEventListener("fullscreenchange", manejador);
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
-  const alternar = useCallback(() => {
+  const toggle = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
     } else {
       document.exitFullscreen().catch(() => {});
     }
   }, []);
-  return { esPantallaCompleta, alternar };
+  return { isFullscreen, toggle };
 }

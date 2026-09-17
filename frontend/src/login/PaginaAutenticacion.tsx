@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { Logo } from "./Logo";
-import { PanelInicioSesion } from "./PanelInicioSesion";
-import { PanelRegistro } from "./PanelRegistro";
-import { usePantallaCompleta } from "./usePantallaCompleta";
-import type { Vista } from "./types";
+import { LoginPanel } from "./PanelInicioSesion";
+import { RegisterPanel } from "./PanelRegistro";
+import { useFullscreen } from "./usePantallaCompleta";
+import { useIsMobile } from "./usePantallaMovil";
+import type { View } from "./types";
 
+/** Container card (top bar, logo, footer) that switches between login and register views. */
 export function PaginaAutenticacion() {
-  const [vista, setVista] = useState<Vista>("inicio");
-  const { esPantallaCompleta, alternar } = usePantallaCompleta();
+  const [view, setView] = useState<View>("login");
+  const { isFullscreen, toggle } = useFullscreen();
+  const mobile = useIsMobile();
 
   return (
     <div className="dot-grid" style={{
       minHeight: "100vh", width: "100%",
       display: "flex", alignItems: "center", justifyContent: "center",
-      padding: "24px 16px", position: "relative",
+      padding: mobile ? "16px 12px" : "24px 16px", position: "relative",
     }}>
-      {/* Manchas ambientales */}
+      {/* Ambient glow blobs */}
       <div style={{
         position: "fixed", top: "5%", left: "8%",
         width: 500, height: 500, borderRadius: "50%",
@@ -29,17 +32,17 @@ export function PaginaAutenticacion() {
         filter: "blur(40px)", pointerEvents: "none",
       }} />
 
-      {/* Tarjeta */}
+      {/* Card */}
       <div className="auth-card corner-tl corner-br" style={{
         width: "100%",
-        maxWidth: vista === "registro" ? 680 : 540,
-        borderRadius: 14,
+        maxWidth: view === "register" ? 680 : 540,
+        borderRadius: mobile ? 10 : 14,
         overflow: "hidden",
         position: "relative",
         transition: "max-width 0.3s ease",
       }}>
 
-        {/* Barra superior — el punto verde activa pantalla completa */}
+        {/* Top bar — the green dot toggles fullscreen */}
         <div style={{
           display: "flex", alignItems: "center", gap: 7,
           padding: "11px 18px",
@@ -49,13 +52,13 @@ export function PaginaAutenticacion() {
           <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#ff5f57" }} />
           <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#febc2e" }} />
           <button
-            onClick={alternar}
-            title={esPantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
+            onClick={toggle}
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
             style={{
               width: 11, height: 11, borderRadius: "50%",
-              background: esPantallaCompleta ? "#00ffcc" : "#28c840",
+              background: isFullscreen ? "#00ffcc" : "#28c840",
               border: "none", cursor: "pointer", padding: 0,
-              boxShadow: esPantallaCompleta ? "0 0 8px rgba(0,255,204,0.7)" : "none",
+              boxShadow: isFullscreen ? "0 0 8px rgba(0,255,204,0.7)" : "none",
               transition: "all 0.2s",
             }}
           />
@@ -78,19 +81,19 @@ export function PaginaAutenticacion() {
           </div>
         </div>
 
-        {/* Cuerpo */}
-        <div style={{ padding: "44px 52px 38px" }}>
-          <Logo />
+        {/* Body */}
+        <div style={{ padding: mobile ? "24px 20px 20px" : "44px 52px 38px" }}>
+          <Logo mobile={mobile} />
 
-          {vista === "inicio"
-            ? <PanelInicioSesion alCambiarVista={() => setVista("registro")} />
-            : <PanelRegistro alCambiarVista={() => setVista("inicio")} />}
+          {view === "login"
+            ? <LoginPanel onSwitchView={() => setView("register")} mobile={mobile} />
+            : <RegisterPanel onSwitchView={() => setView("login")} mobile={mobile} />}
         </div>
 
-        {/* Pie de página */}
+        {/* Footer */}
         <div style={{
           borderTop: "1px solid rgba(0,212,255,0.08)",
-          padding: "10px 36px",
+          padding: mobile ? "10px 20px" : "10px 36px",
           display: "flex", justifyContent: "space-between",
           background: "rgba(0,0,0,0.2)",
         }}>

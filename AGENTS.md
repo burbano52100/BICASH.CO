@@ -1,6 +1,8 @@
 # bicash-co
 
-Monorepo (workspaces de pnpm) con tres capas: `frontend/` (React + Vite + Tailwind CSS, ejecutándose dentro de Figma Make), `backend/` (API en Node.js + Express) y `database/` (esquema de PostgreSQL). La funcionalidad de login/registro abarca las tres capas: la interfaz en `frontend/src/login/`, los endpoints en `backend/src/routes/autenticacion.ts`, y la tabla `usuarios` en `database/schema.sql`.
+Monorepo (workspaces de pnpm) con tres capas: `frontend/` (React + Vite + Tailwind CSS, ejecutándose dentro de Figma Make), `backend/` (API en Node.js + Express) y `database/` (esquema de PostgreSQL). La funcionalidad de login/registro abarca las tres capas: la interfaz en `frontend/src/login/`, los endpoints en `backend/src/routes/autenticacion.ts`, y la tabla `users` en `database/schema.sql`.
+
+**Convención de idioma:** los nombres de carpetas y archivos se mantienen en español (p. ej. `frontend/src/login/`, `autenticacion.ts`, `baseDatos.ts`, `PanelInicioSesion.tsx`), mientras que el código en sí — identificadores, funciones, tipos, comentarios y documentación técnica — está en inglés. El texto visible para el usuario final (etiquetas, botones, mensajes de error) permanece en español, ya que BICASH.CO es un producto para el mercado hispanohablante.
 
 ## Servidor de desarrollo
 
@@ -26,11 +28,11 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 - `src/App.tsx` - Renderiza `PaginaAutenticacion` desde `src/login/`
 - `src/login/` - Toda la interfaz y lógica de cliente de login/registro:
   - `PaginaAutenticacion.tsx` - La tarjeta contenedora (barra superior, logo, pie de página) que alterna entre las vistas de inicio de sesión y registro
-  - `PanelInicioSesion.tsx` - Formulario de inicio de sesión; llama al backend mediante `api.ts` y muestra un estado autenticado/cierre de sesión al tener éxito
-  - `PanelRegistro.tsx` - Formulario de registro; llama al backend mediante `api.ts` y muestra un estado de éxito
-  - `api.ts` - Envoltorios de `fetch` para `POST /api/autenticacion/iniciar-sesion` y `POST /api/autenticacion/registro`
-  - `CamposFormulario.tsx` - Componentes de campo compartidos (`Etiqueta`, `CampoTexto`, `CampoSelector`, `CajaError`, `IndicadorCarga`, `FortalezaContrasena`)
-  - `Logo.tsx`, `usePantallaCompleta.ts`, `types.ts` - Lógica e interfaz de soporte
+  - `PanelInicioSesion.tsx` - Formulario de inicio de sesión (`LoginPanel`); llama al backend mediante `api.ts` y muestra un estado autenticado/cierre de sesión al tener éxito
+  - `PanelRegistro.tsx` - Formulario de registro (`RegisterPanel`); llama al backend mediante `api.ts` y muestra un estado de éxito
+  - `api.ts` - Envoltorios de `fetch` para `POST /api/auth/login` y `POST /api/auth/register`
+  - `CamposFormulario.tsx` - Componentes de campo compartidos (`Label`, `TextField`, `SelectField`, `ErrorBox`, `LoadingSpinner`, `PasswordStrength`)
+  - `Logo.tsx`, `usePantallaCompleta.ts` (`useFullscreen`), `usePantallaMovil.ts` (`useIsMobile`), `types.ts` - Lógica e interfaz de soporte
   - `index.ts` - Exportación centralizada (barrel)
 - `src/index.css` - Punto de entrada de CSS global e import de Tailwind CSS v4
 - `index.html` - Plantilla HTML de Vite que contiene el elemento `#root` y carga `src/main.tsx`
@@ -39,17 +41,17 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 
 ### `backend/` - API en Node.js + Express
 
-- `src/index.ts` - Arranque de la app Express (CORS, parseo de JSON, `/api/salud`, monta `routes/autenticacion.ts`, manejador de errores)
-- `src/routes/autenticacion.ts` - `POST /api/autenticacion/registro` y `POST /api/autenticacion/iniciar-sesion`; aplica hash a las contraseñas con bcrypt y emite un JWT al iniciar sesión
+- `src/index.ts` - Arranque de la app Express (CORS, parseo de JSON, `/api/health`, monta `routes/autenticacion.ts`, manejador de errores)
+- `src/routes/autenticacion.ts` - `POST /api/auth/register` y `POST /api/auth/login`; aplica hash a las contraseñas con bcrypt y emite un JWT al iniciar sesión
 - `src/baseDatos.ts` - Pool de conexiones `pg` construido a partir de `DATABASE_URL`
-- `src/middleware/manejadorErrores.ts` - Manejador de errores de Express genérico
+- `src/middleware/manejadorErrores.ts` - Manejador de errores de Express genérico (`errorHandler`)
 - `scripts/migrate.ts` - Aplica `database/schema.sql` contra `DATABASE_URL`
 - `.env.example` - Cópialo a `.env` y completa `DATABASE_URL`, `JWT_SECRET`, `PORT`, `CORS_ORIGIN`
 - `package.json` - Dependencias del backend y scripts `dev`/`build`/`start`/`db:migrate` (`tsx` para desarrollo, `tsc` para build)
 
 ### `database/` - Esquema de PostgreSQL
 
-- `schema.sql` - Tabla `usuarios` (nombre completo, usuario, correo, rol, hash de contraseña con bcrypt) más índices
+- `schema.sql` - Tabla `users` (nombre completo, usuario, correo, rol, hash de contraseña con bcrypt) más índices
 - `README.md` - Instrucciones de configuración local y referencia de columnas
 
 ## Dependencias

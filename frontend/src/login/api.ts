@@ -1,40 +1,44 @@
-import type { FormularioRegistro } from "./types";
+import type { RegisterForm } from "./types";
 
-const BASE_API = "/api/autenticacion";
+const API_BASE = "/api/auth";
 
-export interface UsuarioAutenticado {
+/** A user account as returned by the backend. */
+export interface AuthenticatedUser {
   id: string;
-  nombreCompleto: string;
-  usuario: string;
-  correo: string;
-  rol: string;
+  fullName: string;
+  username: string;
+  email: string;
+  role: string;
 }
 
-export interface RespuestaInicioSesion {
+export interface LoginResponse {
   token: string;
-  usuario: UsuarioAutenticado;
+  user: AuthenticatedUser;
 }
 
-async function procesarRespuesta<T>(res: Response): Promise<T> {
-  const datos = await res.json().catch(() => null);
+/** Parses a fetch Response as JSON, throwing the backend's `message` on non-2xx. */
+async function parseResponse<T>(res: Response): Promise<T> {
+  const data = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new Error(datos?.mensaje || "Ocurrió un error inesperado.");
+    throw new Error(data?.message || "Ocurrió un error inesperado.");
   }
-  return datos as T;
+  return data as T;
 }
 
-export function iniciarSesion(usuario: string, contrasena: string): Promise<RespuestaInicioSesion> {
-  return fetch(`${BASE_API}/iniciar-sesion`, {
+/** POST /api/auth/login */
+export function login(username: string, password: string): Promise<LoginResponse> {
+  return fetch(`${API_BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ usuario, contrasena }),
-  }).then((res) => procesarRespuesta<RespuestaInicioSesion>(res));
+    body: JSON.stringify({ username, password }),
+  }).then((res) => parseResponse<LoginResponse>(res));
 }
 
-export function registrar(formulario: FormularioRegistro): Promise<{ usuario: UsuarioAutenticado }> {
-  return fetch(`${BASE_API}/registro`, {
+/** POST /api/auth/register */
+export function register(form: RegisterForm): Promise<{ user: AuthenticatedUser }> {
+  return fetch(`${API_BASE}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formulario),
-  }).then((res) => procesarRespuesta<{ usuario: UsuarioAutenticado }>(res));
+    body: JSON.stringify(form),
+  }).then((res) => parseResponse<{ user: AuthenticatedUser }>(res));
 }

@@ -1,4 +1,5 @@
-export function Etiqueta({ children }: { children: React.ReactNode }) {
+/** Small uppercase field caption used above every input/select. */
+export function Label({ children }: { children: React.ReactNode }) {
   return (
     <label style={{
       fontFamily: "Rajdhani, sans-serif",
@@ -15,20 +16,20 @@ export function Etiqueta({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function CampoTexto({
-  etiqueta, tipo = "text", valor, alCambiar, marcadorPosicion, mono = false,
+export function TextField({
+  label, type = "text", value, onChange, placeholder, mono = false,
 }: {
-  etiqueta: string; tipo?: string; valor: string;
-  alCambiar: (v: string) => void; marcadorPosicion?: string; mono?: boolean;
+  label: string; type?: string; value: string;
+  onChange: (v: string) => void; placeholder?: string; mono?: boolean;
 }) {
   return (
     <div>
-      <Etiqueta>{etiqueta}</Etiqueta>
+      <Label>{label}</Label>
       <input
-        type={tipo}
-        value={valor}
-        onChange={(e) => alCambiar(e.target.value)}
-        placeholder={marcadorPosicion}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
         className="tech-input"
         style={mono ? { fontFamily: "JetBrains Mono, monospace", fontSize: "1rem" } : { fontSize: "1rem" }}
       />
@@ -36,28 +37,28 @@ export function CampoTexto({
   );
 }
 
-export function CampoSelector({
-  etiqueta, valor, alCambiar, opciones,
+export function SelectField({
+  label, value, onChange, options,
 }: {
-  etiqueta: string; valor: string; alCambiar: (v: string) => void; opciones: string[];
+  label: string; value: string; onChange: (v: string) => void; options: string[];
 }) {
   return (
     <div>
-      <Etiqueta>{etiqueta}</Etiqueta>
+      <Label>{label}</Label>
       <select
-        value={valor}
-        onChange={(e) => alCambiar(e.target.value)}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="tech-input"
-        style={{ cursor: "pointer", appearance: "none" as const, color: valor ? "#e2e8f8" : "#3a4a6a" }}
+        style={{ cursor: "pointer", appearance: "none" as const, color: value ? "#e2e8f8" : "#3a4a6a" }}
       >
         <option value="">Seleccionar rol...</option>
-        {opciones.map((o) => <option key={o} value={o}>{o}</option>)}
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
     </div>
   );
 }
 
-export function CajaError({ mensaje }: { mensaje: string }) {
+export function ErrorBox({ message }: { message: string }) {
   return (
     <div style={{
       background: "rgba(239,68,68,0.08)",
@@ -68,12 +69,13 @@ export function CajaError({ mensaje }: { mensaje: string }) {
       fontFamily: "JetBrains Mono, monospace",
       fontSize: "0.72rem",
     }}>
-      ⚠ {mensaje}
+      ⚠ {message}
     </div>
   );
 }
 
-export function IndicadorCarga() {
+/** Small spinner shown on submit buttons while a request is in flight. */
+export function LoadingSpinner() {
   return (
     <svg className="animate-spin" width="16" height="16" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="6" stroke="rgba(5,8,16,0.3)" strokeWidth="2" />
@@ -82,26 +84,27 @@ export function IndicadorCarga() {
   );
 }
 
-export function FortalezaContrasena({ contrasena }: { contrasena: string }) {
-  const comprobaciones = [contrasena.length >= 8, /[A-Z]/.test(contrasena), /[0-9]/.test(contrasena), /[^A-Za-z0-9]/.test(contrasena)];
-  const puntaje = comprobaciones.filter(Boolean).length;
-  const etiquetas = ["Débil", "Regular", "Buena", "Fuerte"];
-  const colores = ["#ef4444", "#f97316", "#00d4ff", "#00ffcc"];
+/** Visual password strength meter based on length/uppercase/digit/symbol checks. */
+export function PasswordStrength({ password }: { password: string }) {
+  const checks = [password.length >= 8, /[A-Z]/.test(password), /[0-9]/.test(password), /[^A-Za-z0-9]/.test(password)];
+  const score = checks.filter(Boolean).length;
+  const labels = ["Débil", "Regular", "Buena", "Fuerte"];
+  const colors = ["#ef4444", "#f97316", "#00d4ff", "#00ffcc"];
   return (
     <div>
       <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
-        {[0,1,2,3].map((i) => (
+        {[0, 1, 2, 3].map((i) => (
           <div key={i} style={{
             flex: 1, height: 3, borderRadius: 99,
-            background: i < puntaje ? colores[puntaje - 1] : "rgba(255,255,255,0.07)",
+            background: i < score ? colors[score - 1] : "rgba(255,255,255,0.07)",
             transition: "background 0.3s",
-            boxShadow: i < puntaje ? `0 0 5px ${colores[puntaje-1]}60` : "none",
+            boxShadow: i < score ? `0 0 5px ${colors[score - 1]}60` : "none",
           }} />
         ))}
       </div>
-      {puntaje > 0 && (
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.65rem", color: colores[puntaje-1] }}>
-          Seguridad: {etiquetas[puntaje - 1]}
+      {score > 0 && (
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.65rem", color: colors[score - 1] }}>
+          Seguridad: {labels[score - 1]}
         </div>
       )}
     </div>

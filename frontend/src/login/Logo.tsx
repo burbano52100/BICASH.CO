@@ -1,7 +1,8 @@
-export function Logo() {
+/** BICACH.CO wordmark and hexagonal badge shown above the auth forms. */
+export function Logo({ mobile = false }: { mobile?: boolean }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 28 }}>
-      <div style={{ position: "relative", width: 90, height: 90 }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: mobile ? 20 : 28 }}>
+      <div style={{ position: "relative", width: mobile ? 60 : 90, height: mobile ? 60 : 90 }}>
         <svg viewBox="0 0 64 64" fill="none" style={{ width: "100%", height: "100%" }}>
           <polygon
             points="32,4 58,18 58,46 32,60 6,46 6,18"
@@ -29,7 +30,7 @@ export function Logo() {
         <div style={{
           fontFamily: "Rajdhani, sans-serif",
           fontWeight: 700,
-          fontSize: "2.6rem",
+          fontSize: mobile ? "1.8rem" : "2.6rem",
           letterSpacing: "0.22em",
           color: "#e2e8f8",
           lineHeight: 1.1,
@@ -38,8 +39,8 @@ export function Logo() {
         </div>
         <div style={{
           fontFamily: "JetBrains Mono, monospace",
-          fontSize: "0.82rem",
-          letterSpacing: "0.28em",
+          fontSize: mobile ? "0.6rem" : "0.82rem",
+          letterSpacing: mobile ? "0.16em" : "0.28em",
           color: "#3a5070",
           marginTop: 6,
         }}>

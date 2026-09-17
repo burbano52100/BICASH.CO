@@ -1,40 +1,41 @@
 import { useState } from "react";
-import { CampoTexto, CampoSelector, CajaError, IndicadorCarga, FortalezaContrasena } from "./CamposFormulario";
-import { ROLES, type FormularioRegistro } from "./types";
-import { registrar } from "./api";
+import { TextField, SelectField, ErrorBox, LoadingSpinner, PasswordStrength } from "./CamposFormulario";
+import { ROLES, type RegisterForm } from "./types";
+import { register } from "./api";
 
-export function PanelRegistro({ alCambiarVista }: { alCambiarVista: () => void }) {
-  const [formulario, setFormulario] = useState<FormularioRegistro>({
-    nombreCompleto: "", usuario: "", correo: "", rol: "", contrasena: "", confirmarContrasena: "",
+/** Registration form; shows a success state once the account is created. */
+export function RegisterPanel({ onSwitchView, mobile }: { onSwitchView: () => void; mobile: boolean }) {
+  const [form, setForm] = useState<RegisterForm>({
+    fullName: "", username: "", email: "", role: "", password: "", confirmPassword: "",
   });
-  const [cargando, setCargando] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [exito, setExito] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  function establecer(campo: keyof FormularioRegistro) {
-    return (v: string) => setFormulario((f) => ({ ...f, [campo]: v }));
+  function setField(field: keyof RegisterForm) {
+    return (v: string) => setForm((f) => ({ ...f, [field]: v }));
   }
 
-  async function manejarEnvio(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const { nombreCompleto, usuario, correo, rol, contrasena, confirmarContrasena } = formulario;
-    if (!nombreCompleto || !usuario || !correo || !rol || !contrasena || !confirmarContrasena) {
+    const { fullName, username, email, role, password, confirmPassword } = form;
+    if (!fullName || !username || !email || !role || !password || !confirmPassword) {
       setError("Todos los campos son obligatorios."); return;
     }
-    if (contrasena !== confirmarContrasena) { setError("Las contraseñas no coinciden."); return; }
-    if (contrasena.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
-    setError(""); setCargando(true);
+    if (password !== confirmPassword) { setError("Las contraseñas no coinciden."); return; }
+    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
+    setError(""); setLoading(true);
     try {
-      await registrar(formulario);
-      setExito(true);
+      await register(form);
+      setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo crear la cuenta.");
     } finally {
-      setCargando(false);
+      setLoading(false);
     }
   }
 
-  if (exito) {
+  if (success) {
     return (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "16px 0", textAlign: "center" }}>
         <div style={{
@@ -54,7 +55,7 @@ export function PanelRegistro({ alCambiarVista }: { alCambiarVista: () => void }
             Tu acceso ha sido registrado exitosamente.
           </p>
         </div>
-        <button onClick={alCambiarVista} className="btn-primary"
+        <button onClick={onSwitchView} className="btn-primary"
           style={{ padding: "10px 32px", borderRadius: 8, fontSize: "0.85rem" }}>
           INICIAR SESIÓN
         </button>
@@ -63,28 +64,28 @@ export function PanelRegistro({ alCambiarVista }: { alCambiarVista: () => void }
   }
 
   return (
-    <form onSubmit={manejarEnvio} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <CampoTexto etiqueta="Nombre completo" valor={formulario.nombreCompleto} alCambiar={establecer("nombreCompleto")} marcadorPosicion="Ana Torres" />
-        <CampoTexto etiqueta="Usuario" valor={formulario.usuario} alCambiar={establecer("usuario")} marcadorPosicion="usuario@gmail.com" mono />
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: mobile ? 14 : 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+        <TextField label="Nombre completo" value={form.fullName} onChange={setField("fullName")} placeholder="Ana Torres" />
+        <TextField label="Usuario" value={form.username} onChange={setField("username")} placeholder="usuario@gmail.com" mono />
       </div>
-      <CampoTexto etiqueta="Correo electrónico" tipo="email" valor={formulario.correo} alCambiar={establecer("correo")} marcadorPosicion="correo@gmail.com" mono />
-      <CampoSelector etiqueta="Rol" valor={formulario.rol} alCambiar={establecer("rol")} opciones={ROLES} />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <CampoTexto etiqueta="Contraseña" tipo="password" valor={formulario.contrasena} alCambiar={establecer("contrasena")} marcadorPosicion="Mín. 8 caracteres" />
-        <CampoTexto etiqueta="Confirmar" tipo="password" valor={formulario.confirmarContrasena} alCambiar={establecer("confirmarContrasena")} marcadorPosicion="Repetir" />
+      <TextField label="Correo electrónico" type="email" value={form.email} onChange={setField("email")} placeholder="correo@gmail.com" mono />
+      <SelectField label="Rol" value={form.role} onChange={setField("role")} options={ROLES} />
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+        <TextField label="Contraseña" type="password" value={form.password} onChange={setField("password")} placeholder="Mín. 8 caracteres" />
+        <TextField label="Confirmar" type="password" value={form.confirmPassword} onChange={setField("confirmPassword")} placeholder="Repetir" />
       </div>
-      {formulario.contrasena.length > 0 && <FortalezaContrasena contrasena={formulario.contrasena} />}
-      {error && <CajaError mensaje={error} />}
-      <button type="submit" disabled={cargando} className="btn-primary"
+      {form.password.length > 0 && <PasswordStrength password={form.password} />}
+      {error && <ErrorBox message={error} />}
+      <button type="submit" disabled={loading} className="btn-primary"
         style={{ width: "100%", padding: "12px", borderRadius: 8, fontSize: "0.88rem", marginTop: 4 }}>
-        {cargando
-          ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><IndicadorCarga /> REGISTRANDO...</span>
+        {loading
+          ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><LoadingSpinner /> REGISTRANDO...</span>
           : "CREAR CUENTA"}
       </button>
       <p style={{ textAlign: "center", margin: 0, fontFamily: "Exo 2, sans-serif", fontSize: "1rem", color: "#3a5070" }}>
         ¿Ya tienes cuenta?{" "}
-        <button type="button" onClick={alCambiarVista} style={{
+        <button type="button" onClick={onSwitchView} style={{
           background: "none", border: "none", cursor: "pointer",
           color: "#00d4ff", fontFamily: "Rajdhani, sans-serif",
           fontWeight: 700, fontSize: "1rem", letterSpacing: "0.08em",

@@ -1,5 +1,4 @@
 import { Router } from "express";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../baseDatos";
 
@@ -26,13 +25,11 @@ authRouter.post("/register", async (req, res, next) => {
       return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres." });
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
-
     const result = await pool.query(
-      `INSERT INTO users (full_name, username, email, role, password_hash)
+      `INSERT INTO users (full_name, username, email, role, password)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id, full_name AS "fullName", username, email, role, created_at AS "createdAt"`,
-      [fullName, username, email, role, passwordHash],
+      [fullName, username, email, role, password],
     );
 
     return res.status(201).json({ user: result.rows[0] });
@@ -55,13 +52,13 @@ authRouter.post("/login", async (req, res, next) => {
     }
 
     const result = await pool.query(
-      `SELECT id, full_name, username, email, role, password_hash
+      `SELECT id, full_name, username, email, role, password
        FROM users WHERE username = $1 OR email = $1`,
       [username],
     );
     const foundUser = result.rows[0];
 
-    if (!foundUser || !(await bcrypt.compare(password, foundUser.password_hash))) {
+    if (!foundUser || foundUser.password !== password) {
       return res.status(401).json({ message: "Credenciales inválidas." });
     }
 

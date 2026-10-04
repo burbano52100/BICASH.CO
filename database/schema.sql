@@ -1,14 +1,12 @@
 -- BICASH.CO — database schema (PostgreSQL)
 
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id SERIAL PRIMARY KEY,
   full_name TEXT NOT NULL,
   username TEXT NOT NULL UNIQUE,
   email TEXT NOT NULL UNIQUE,
   role TEXT NOT NULL CHECK (role IN ('Administrador', 'Analista', 'Desarrollador', 'Operador', 'Invitado')),
-  password_hash TEXT NOT NULL,
+  password TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

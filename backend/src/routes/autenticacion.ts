@@ -10,13 +10,17 @@ const ROLES = ["Administrador", "Analista", "Desarrollador", "Operador", "Invita
 /** POST /api/auth/register — creates a new user account. */
 authRouter.post("/register", async (req, res, next) => {
   try {
-    const { fullName, username, email, role, password, confirmPassword } = req.body ?? {};
+    const { fullName, username, email, role, password, confirmPassword, phone, salaryType, salaryAmount } = req.body ?? {};
 
-    if (!fullName || !username || !email || !role || !password || !confirmPassword) {
+    if (!fullName || !username || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "Todos los campos son obligatorios." });
     }
-    if (!ROLES.includes(role)) {
+    const finalRole = role ?? "Invitado";
+    if (!ROLES.includes(finalRole)) {
       return res.status(400).json({ message: "Rol inválido." });
+    }
+    if (salaryType && !["fijo", "variable"].includes(salaryType)) {
+      return res.status(400).json({ message: "Tipo de salario inválido." });
     }
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Las contraseñas no coinciden." });
@@ -26,13 +30,25 @@ authRouter.post("/register", async (req, res, next) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO users (full_name, username, email, role, password)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, full_name AS "fullName", username, email, role, created_at AS "createdAt"`,
-      [fullName, username, email, role, password],
+      `INSERT INTO users (full_name, username, email, role, password, phone, salary_type, salary_amount)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, full_name AS "fullName", username, email, role, password, phone, salary_type AS "salaryType", salary_amount AS "salaryAmount", created_at AS "createdAt"`,
+      [fullName, username, email, finalRole, password, phone ?? null, salaryType ?? "variable", salaryAmount ? Number(salaryAmount) : null],
     );
 
-    return res.status(201).json({ user: result.rows[0] });
+    const row = result.rows[0];
+    return res.status(201).json({
+      user: {
+        ...row,
+        password: row.password,
+        phone: row.phone ?? "No registrado",
+        joinDate: new Date(row.createdAt).toLocaleDateString("es-CO", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      },
+    });
   } catch (err: any) {
     // Postgres unique_violation: username or email already exists.
     if (err?.code === "23505") {
@@ -52,7 +68,7 @@ authRouter.post("/login", async (req, res, next) => {
     }
 
     const result = await pool.query(
-      `SELECT id, full_name, username, email, role, password
+      `SELECT id, full_name, username, email, role, password, phone, salary_type, salary_amount, created_at
        FROM users WHERE username = $1 OR email = $1`,
       [username],
     );
@@ -76,6 +92,15 @@ authRouter.post("/login", async (req, res, next) => {
         username: foundUser.username,
         email: foundUser.email,
         role: foundUser.role,
+        password: foundUser.password,
+        phone: foundUser.phone ?? "No registrado",
+        salaryType: foundUser.salary_type ?? "variable",
+        salaryAmount: foundUser.salary_amount ?? null,
+        joinDate: new Date(foundUser.created_at).toLocaleDateString("es-CO", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
       },
     });
   } catch (err) {

@@ -1,8 +1,8 @@
 # bicash-co
 
-Monorepo (workspaces de pnpm) con tres capas: `frontend/` (React + Vite + Tailwind CSS, ejecutándose dentro de Figma Make), `backend/` (API en Node.js + Express) y `database/` (esquema de PostgreSQL). La funcionalidad de login/registro abarca las tres capas: la interfaz en `frontend/src/login/`, los endpoints en `backend/src/routes/autenticacion.ts`, y la tabla `users` en `database/schema.sql`.
+Monorepo (workspaces de pnpm) con tres capas: `frontend/` (React + Vite + Tailwind CSS, ejecutándose dentro de Figma Make), `backend/` (API en Node.js + Express) y `database/` (esquema de PostgreSQL). La funcionalidad de login/registro abarca las tres capas: la interfaz en `frontend/src/App.tsx`, los endpoints en `backend/src/routes/autenticacion.ts`, y la tabla `users` en `database/schema.sql`.
 
-**Convención de idioma:** los nombres de carpetas y archivos se mantienen en español (p. ej. `frontend/src/login/`, `autenticacion.ts`, `baseDatos.ts`, `PanelInicioSesion.tsx`), mientras que el código en sí — identificadores, funciones, tipos, comentarios y documentación técnica — está en inglés. El texto visible para el usuario final (etiquetas, botones, mensajes de error) permanece en español, ya que BICASH.CO es un producto para el mercado hispanohablante.
+**Convención de idioma:** los nombres de carpetas y archivos se mantienen en español (p. ej. `frontend/src/App.tsx`, `autenticacion.ts`, `baseDatos.ts`), mientras que el código en sí — identificadores, funciones, tipos, comentarios y documentación técnica — está en inglés. El texto visible para el usuario final (etiquetas, botones, mensajes de error) permanece en español, ya que BICASH.CO es un producto para el mercado hispanohablante.
 
 ## Servidor de desarrollo
 
@@ -25,15 +25,7 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 ### `frontend/` - Interfaz en React + Vite + Tailwind CSS
 
 - `src/main.tsx` - Punto de entrada de React; importa `src/index.css` y monta `src/App.tsx` en el elemento `#root`
-- `src/App.tsx` - Renderiza `PaginaAutenticacion` desde `src/login/`
-- `src/login/` - Toda la interfaz y lógica de cliente de login/registro:
-  - `PaginaAutenticacion.tsx` - La tarjeta contenedora (barra superior, logo, pie de página) que alterna entre las vistas de inicio de sesión y registro
-  - `PanelInicioSesion.tsx` - Formulario de inicio de sesión (`LoginPanel`); llama al backend mediante `api.ts` y muestra un estado autenticado/cierre de sesión al tener éxito
-  - `PanelRegistro.tsx` - Formulario de registro (`RegisterPanel`); llama al backend mediante `api.ts` y muestra un estado de éxito
-  - `api.ts` - Envoltorios de `fetch` para `POST /api/auth/login` y `POST /api/auth/register`
-  - `CamposFormulario.tsx` - Componentes de campo compartidos (`Label`, `TextField`, `SelectField`, `ErrorBox`, `LoadingSpinner`, `PasswordStrength`)
-  - `Logo.tsx`, `usePantallaCompleta.ts` (`useFullscreen`), `usePantallaMovil.ts` (`useIsMobile`), `types.ts` - Lógica e interfaz de soporte
-  - `index.ts` - Exportación centralizada (barrel)
+- `src/App.tsx` - Toda la app: login/registro, panel de control (Inicio/Gastos y Perfil)
 - `src/index.css` - Punto de entrada de CSS global e import de Tailwind CSS v4
 - `index.html` - Plantilla HTML de Vite que contiene el elemento `#root` y carga `src/main.tsx`
 - `package.json` - Dependencias del frontend y scripts de Vite (dev/build/preview)
@@ -74,5 +66,5 @@ Este proyecto usa **Tailwind CSS v4** a través del plugin `@tailwindcss/vite` c
 
 - Usa comillas dobles para cadenas con apóstrofes (`"We're here to help"`), o escápalas dentro de comillas simples. Un apóstrofe sin escapar dentro de una cadena con comillas simples rompe el build.
 - Asegúrate de que las etiquetas JSX estén cerradas y las llaves balanceadas.
-- Exporta los componentes del frontend como exportaciones nombradas desde `src/login/*` y como exportación por defecto desde `src/App.tsx`.
+- Exporta la app como exportación por defecto desde `src/App.tsx`.
 - Nunca subas `backend/.env` ni credenciales reales; solo `.env.example` está versionado.

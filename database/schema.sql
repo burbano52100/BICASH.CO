@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT NOT NULL UNIQUE,
   role TEXT NOT NULL CHECK (role IN ('Administrador', 'Analista', 'Desarrollador', 'Operador', 'Invitado')),
   password TEXT NOT NULL,
+  phone TEXT,
+  salary_type TEXT CHECK (salary_type IN ('fijo', 'variable')),
+  salary_amount NUMERIC,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

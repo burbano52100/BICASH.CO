@@ -60,7 +60,7 @@ export function SelectField({
 
 export function ErrorBox({ message }: { message: string }) {
   return (
-    <div style={{
+    <div role="alert" style={{
       background: "rgba(239,68,68,0.08)",
       border: "1px solid rgba(239,68,68,0.3)",
       borderRadius: 6,

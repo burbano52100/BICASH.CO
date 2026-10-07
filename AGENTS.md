@@ -42,7 +42,7 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 ### `backend/` - API en Node.js + Express
 
 - `src/index.ts` - Arranque de la app Express (CORS, parseo de JSON, `/api/health`, monta `routes/autenticacion.ts`, manejador de errores)
-- `src/routes/autenticacion.ts` - `POST /api/auth/register` y `POST /api/auth/login`; aplica hash a las contraseñas con bcrypt y emite un JWT al iniciar sesión
+- `src/routes/autenticacion.ts` - `POST /api/auth/register` y `POST /api/auth/login`; guarda las contraseñas en texto plano y emite un JWT al iniciar sesión
 - `src/baseDatos.ts` - Pool de conexiones `pg` construido a partir de `DATABASE_URL`
 - `src/middleware/manejadorErrores.ts` - Manejador de errores de Express genérico (`errorHandler`)
 - `scripts/migrate.ts` - Aplica `database/schema.sql` contra `DATABASE_URL`
@@ -51,7 +51,7 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 
 ### `database/` - Esquema de PostgreSQL
 
-- `schema.sql` - Tabla `users` (nombre completo, usuario, correo, rol, hash de contraseña con bcrypt) más índices
+- `schema.sql` - Tabla `users` (nombre completo, usuario, correo, rol, contraseña en texto plano) más índices
 - `README.md` - Instrucciones de configuración local y referencia de columnas
 
 ## Dependencias
@@ -59,7 +59,7 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 - Runtime del frontend: React 19 y React DOM 19
 - Estilos del frontend: Tailwind CSS v4 con el plugin `@tailwindcss/vite`
 - Herramientas de build del frontend: Vite 8, TypeScript 5.7, y `@vitejs/plugin-react`
-- Runtime del backend: Express, `pg`, `bcryptjs`, `jsonwebtoken`, `dotenv`, `cors`
+- Runtime del backend: Express, `pg`, `jsonwebtoken`, `dotenv`, `cors`
 - Herramientas de build del backend: TypeScript 5.7, `tsx`
 - Base de datos: PostgreSQL (vía `pg`)
 - Formateo: oxfmt (ejecutar desde la raíz del repo: `pnpm format`)

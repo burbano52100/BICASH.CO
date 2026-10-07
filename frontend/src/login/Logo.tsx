@@ -1,4 +1,4 @@
-/** BICACH.CO wordmark and hexagonal badge shown above the auth forms. */
+/** BICASH.CO wordmark and hexagonal badge shown above the auth forms. */
 export function Logo({ mobile = false }: { mobile?: boolean }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: mobile ? 20 : 28 }}>
@@ -35,7 +35,7 @@ export function Logo({ mobile = false }: { mobile?: boolean }) {
           color: "#e2e8f8",
           lineHeight: 1.1,
         }}>
-          BICACH<span style={{ color: "#00d4ff" }}>.CO</span>
+          BICASH<span style={{ color: "#00d4ff" }}>.CO</span>
         </div>
         <div style={{
           fontFamily: "JetBrains Mono, monospace",

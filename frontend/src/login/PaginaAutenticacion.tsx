@@ -35,7 +35,7 @@ export function PaginaAutenticacion() {
       {/* Card */}
       <div className="auth-card corner-tl corner-br" style={{
         width: "100%",
-        maxWidth: view === "register" ? 680 : 540,
+        maxWidth: 620,
         borderRadius: mobile ? 10 : 14,
         overflow: "hidden",
         position: "relative",
@@ -67,7 +67,7 @@ export function PaginaAutenticacion() {
             fontFamily: "JetBrains Mono, monospace",
             fontSize: "0.6rem", color: "#1a2a40", letterSpacing: "0.1em",
           }}>
-            bicach.co / auth
+            bicash.co / auth
           </div>
           <div style={{ flex: 1 }} />
           <div style={{
@@ -98,7 +98,7 @@ export function PaginaAutenticacion() {
           background: "rgba(0,0,0,0.2)",
         }}>
           <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.6rem", color: "#1a2a40" }}>v2.4.1</span>
-          <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.6rem", color: "#1a2a40" }}>© 2026 bicach.co</span>
+          <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.6rem", color: "#1a2a40" }}>© 2026 bicash.co</span>
         </div>
       </div>
     </div>

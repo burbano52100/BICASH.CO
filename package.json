@@ -11,7 +11,8 @@
     "dev:backend": "pnpm --filter backend dev",
     "build:backend": "pnpm --filter backend build",
     "start:backend": "pnpm --filter backend start",
-    "db:migrate": "pnpm --filter backend db:migrate"
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
     "oxfmt": "^0.2.0"

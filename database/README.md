@@ -20,10 +20,10 @@ PostgreSQL. El esquema vive en `schema.sql`.
 
 | Columna         | Tipo          | Notas                                                                 |
 |------------------|---------------|------------------------------------------------------------------------|
-| `id`              | `uuid`        | Clave primaria, generada con `gen_random_uuid()`.                     |
+| `id`              | `integer`     | Clave primaria autoincremental (SERIAL).                |
 | `full_name`       | `text`        | Nombre completo.                                                       |
 | `username`        | `text`        | Nombre de usuario, único.                                              |
 | `email`           | `text`        | Correo electrónico, único.                                             |
 | `role`            | `text`        | Uno de: Administrador, Analista, Desarrollador, Operador, Invitado.    |
-| `password_hash`   | `text`        | Hash bcrypt de la contraseña (nunca se guarda en texto plano).        |
+| `password`       | `text`        | Contraseña en texto plano.                              |
 | `created_at`      | `timestamptz` | Fecha de creación.                                                     |

@@ -60,7 +60,7 @@ Frontend (Vite): `PORT` (8443), `BACKEND_URL` (`http://localhost:4000`), `FIGMA_
 BURBANO.APP/
 ├── frontend/                 # código que se ejecuta en el navegador
 │   ├── public/               # archivos estáticos (favicon.svg)
-│   ├── index.html            # plantilla Vite
+│   ├── index.css            # plantilla Vite
 │   ├── src/
 │   │   ├── assets/           # estilos globales (index.css, Tailwind v4)
 │   │   ├── components/       # componentes reutilizables (Logo, CamposFormulario, InfoSection)

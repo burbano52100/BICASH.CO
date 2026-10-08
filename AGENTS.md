@@ -24,9 +24,14 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 
 ### `frontend/` - Interfaz en React + Vite + Tailwind CSS
 
-- `src/main.tsx` - Punto de entrada de React; importa `src/index.css` y monta `src/App.tsx` en el elemento `#root`
+- `src/main.tsx` - Punto de entrada de React; importa `src/assets/index.css` y monta `src/App.tsx` en el elemento `#root`
 - `src/App.tsx` - Toda la app: login/registro, panel de control (Inicio/Gastos y Perfil)
-- `src/index.css` - Punto de entrada de CSS global e import de Tailwind CSS v4
+- `src/assets/index.css` - Punto de entrada de CSS global e import de Tailwind CSS v4
+- `src/components/` - Componentes reutilizables (`Logo.tsx`, `CamposFormulario.tsx`, `InfoSection.tsx`)
+- `src/views/` - Pantallas completas (`LoginView.tsx`, `DashboardView.tsx`)
+- `src/hooks/` - `useIsMobile.ts`
+- `src/services/` - `api.ts` con los llamados HTTP al backend
+- `public/` - Archivos estáticos (favicon)
 - `index.html` - Plantilla HTML de Vite que contiene el elemento `#root` y carga `src/main.tsx`
 - `package.json` - Dependencias del frontend y scripts de Vite (dev/build/preview)
 - `vite.config.ts` - Configuración de Vite con React, Tailwind CSS v4, plugins de Figma Make, el alias `@` para `src`, un `outDir` de build apuntando al `dist/` de la raíz del repo (para que `.figma/make/deploy` siga funcionando), y un proxy `/api` del servidor de desarrollo hacia el backend
@@ -35,8 +40,10 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 
 - `src/index.ts` - Arranque de la app Express (CORS, parseo de JSON, `/api/health`, monta `routes/autenticacion.ts`, manejador de errores)
 - `src/routes/autenticacion.ts` - `POST /api/auth/register` y `POST /api/auth/login`; guarda las contraseñas en texto plano y emite un JWT al iniciar sesión
-- `src/baseDatos.ts` - Pool de conexiones `pg` construido a partir de `DATABASE_URL`
-- `src/middleware/manejadorErrores.ts` - Manejador de errores de Express genérico (`errorHandler`)
+- `src/config/baseDatos.ts` - Pool de conexiones `pg` construido a partir de `DATABASE_URL`
+- `src/controllers/autenticacionController.ts` - Lógica de register/login
+- `src/models/usuario.ts` - Interfaz `Usuario` y lista `ROLES`
+- `src/middlewares/manejadorErrores.ts` - Manejador de errores de Express genérico (`errorHandler`)
 - `scripts/migrate.ts` - Aplica `database/schema.sql` contra `DATABASE_URL`
 - `.env.example` - Cópialo a `.env` y completa `DATABASE_URL`, `JWT_SECRET`, `PORT`, `CORS_ORIGIN`
 - `package.json` - Dependencias del backend y scripts `dev`/`build`/`start`/`db:migrate` (`tsx` para desarrollo, `tsc` para build)
@@ -58,9 +65,9 @@ Esta es la estructura canónica del proyecto. Empieza por los archivos relevante
 
 ## Estilos
 
-Este proyecto usa **Tailwind CSS v4** a través del plugin `@tailwindcss/vite` configurado en `frontend/vite.config.ts`. `frontend/src/index.css` importa Tailwind con `@import 'tailwindcss';`. Usa clases utilitarias de Tailwind directamente en el JSX y coloca el CSS global o la personalización del tema de Tailwind v4 en `frontend/src/index.css`. Este scaffold no necesita un archivo de configuración de Tailwind ni de PostCSS.
+Este proyecto usa **Tailwind CSS v4** a través del plugin `@tailwindcss/vite` configurado en `frontend/vite.config.ts`. `frontend/src/assets/index.css` importa Tailwind con `@import 'tailwindcss';`. Usa clases utilitarias de Tailwind directamente en el JSX y coloca el CSS global o la personalización del tema de Tailwind v4 en `frontend/src/assets/index.css`. Este scaffold no necesita un archivo de configuración de Tailwind ni de PostCSS.
 
-`frontend/src/main.tsx` importa `frontend/src/index.css`, así que la configuración global de fuentes va en `frontend/src/index.css`. Mantén los `@import` de CSS primero, y luego agrega cualquier regla `@font-face` y los valores por defecto de `font-family` ahí.
+`frontend/src/main.tsx` importa `frontend/src/assets/index.css`, así que la configuración global de fuentes va en `frontend/src/assets/index.css`. Mantén los `@import` de CSS primero, y luego agrega cualquier regla `@font-face` y los valores por defecto de `font-family` ahí.
 
 ## Calidad de código
 

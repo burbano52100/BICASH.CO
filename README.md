@@ -58,30 +58,39 @@ Frontend (Vite): `PORT` (8443), `BACKEND_URL` (`http://localhost:4000`), `FIGMA_
 
 ```
 BURBANO.APP/
-├── package.json            # scripts raíz del monorepo
-├── pnpm-workspace.yaml     # paquetes: frontend, backend
-├── .mise.toml              # tool versions
-├── AGENTS.md / CLAUDE.md   # guía para agentes
-├── README.md               # esta documentación
-├── CAMBIOS.md              # cambios realizados por carpeta
-├── LICENSE / .editorconfig / .gitattributes
-├── .github/workflows/ci.yml
-├── frontend/
-│   ├── index.html, package.json, tsconfig.json, vite.config.ts
-│   └── src/
-│       ├── main.tsx        # punto de entrada; monta App
-│       ├── App.tsx         # app completa: login/registro + panel de control
-│       └── index.css       # fuentes, Tailwind v4, estilos globales
-├── backend/
+├── frontend/                 # código que se ejecuta en el navegador
+│   ├── public/               # archivos estáticos (favicon.svg)
+│   ├── index.html            # plantilla Vite
 │   ├── src/
-│   │   ├── index.ts        # bootstrap Express
-│   │   ├── baseDatos.ts    # pool pg
-│   │   ├── routes/autenticacion.ts
-│   │   └── middleware/manejadorErrores.ts
-│   └── scripts/migrate.ts
-└── database/
-    ├── schema.sql
-    └── README.md
+│   │   ├── assets/           # estilos globales (index.css, Tailwind v4)
+│   │   ├── components/       # componentes reutilizables (Logo, CamposFormulario, InfoSection)
+│   │   ├── views/            # pantallas completas (LoginView, DashboardView)
+│   │   ├── hooks/            # useIsMobile
+│   │   ├── services/         # llamadas HTTP al backend (api.ts)
+│   │   ├── App.tsx           # punto de entrada de la aplicación cliente
+│   │   └── main.tsx          # monta App en #root
+│   ├── package.json
+│   └── README.md
+├── backend/                  # lógica del servidor y reglas de negocio
+│   ├── src/
+│   │   ├── config/           # conexión a PostgreSQL (baseDatos.ts)
+│   │   ├── controllers/      # lógica de register/login
+│   │   ├── models/           # estructura de datos (usuario.ts)
+│   │   ├── routes/           # endpoints /api/auth/*
+│   │   ├── middlewares/      # manejadorErrores
+│   │   └── index.ts          # punto de entrada del servidor
+│   ├── scripts/migrate.ts
+│   ├── package.json
+│   ├── README.md
+│   └── .env                  # credenciales secretas (NO se sube a GitHub)
+├── database/
+│   ├── migrations/           # historial de cambios de esquema
+│   ├── seeds/                # datos de prueba (001_usuarios.sql)
+│   ├── schema.sql            # esquema relacional
+│   └── README.md
+├── docker-compose.yml        # levanta PostgreSQL con un comando
+├── .gitignore
+└── README.md, AGENTS.md, LICENSE, .editorconfig, .github/workflows/ci.yml
 ```
 
 ## Comandos

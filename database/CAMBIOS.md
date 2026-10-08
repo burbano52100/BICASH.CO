@@ -1,5 +1,10 @@
 # Cambios realizados en database/
 
+**Reorganización (2026-10-08):**
+
+- `migrations/001_schema.sql` — copia del esquema como migración versionada.
+- `seeds/001_usuarios.sql` — usuario demo de prueba.
+
 **Importación de Figma Make (2026-10-07):**
 
 - `schema.sql`: nuevas columnas en `users`:

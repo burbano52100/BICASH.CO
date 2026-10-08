@@ -1,5 +1,13 @@
 # Cambios realizados en backend/
 
+**Reorganización (2026-10-08):**
+
+- `src/baseDatos.ts` → `src/config/baseDatos.ts`.
+- Lógica de register/login → `src/controllers/autenticacionController.ts`; `src/routes/autenticacion.ts` quedó como router fino.
+- `src/models/usuario.ts` — interfaz `Usuario` y lista `ROLES`.
+- `src/middleware/` → `src/middlewares/`.
+- `backend/README.md` creado.
+
 **Importación de Figma Make (2026-10-07):**
 
 - `src/routes/autenticacion.ts`:

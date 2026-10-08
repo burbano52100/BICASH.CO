@@ -8,6 +8,17 @@
 - `AGENTS.md` actualizado (ya no existe `frontend/src/login/`).
 - Limpieza de usuarios de prueba en la BD.
 
+## Reorganización del proyecto (2026-10-08)
+
+El proyecto se reorganizó siguiendo una estructura por capas:
+
+- **frontend/**: `src/assets/` (index.css), `src/components/` (`Logo`, `CamposFormulario`, `InfoSection`), `src/views/` (`LoginView`, `DashboardView`), `src/hooks/` (`useIsMobile`), `src/services/` (`api.ts`), `App.tsx` y `main.tsx` como punto de entrada. Añadidos `public/` y `frontend/README.md`.
+- **backend/**: `src/config/` (baseDatos), `src/controllers/` (autenticacionController), `src/models/` (usuario), `src/routes/`, `src/middlewares/`, `scripts/migrate.ts`, `backend/README.md`. Entrada `src/index.ts`.
+- **database/**: `schema.sql`, `migrations/001_schema.sql`, `seeds/001_usuarios.sql`, `README.md`.
+- Raíz: `docker-compose.yml` (PostgreSQL 17 en 5433), `frontend/README.md`, `backend/README.md`, README actualizado.
+
+Todo verificado: `pnpm typecheck` ✅, `pnpm build` ✅, register/login vía proxy ✅.
+
 **Mejoras anteriores:**
 
 - Se creó `README.md` (antes era `DOCUMENTACION.md`) con la documentación completa del proyecto; en GitHub ahora aparece como portada del repo.
